@@ -23,13 +23,13 @@ module.exports = {
 
         // --- PRE-LOAD IMAGE INTO RAM ---
         const imageUrl = "https://raw.githubusercontent.com/popkidke/GEMINI/main/popkid.jpg";
+        
         if (!menuBuffer) {
             try {
                 const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
                 menuBuffer = Buffer.from(response.data);
             } catch (e) {
                 console.error("Menu Image Cache Error:", e);
-                menuBuffer = null;
             }
         }
 
@@ -73,16 +73,17 @@ module.exports = {
 
         menuText += `\n*© 𝟤𝟢𝟤𝟨 ᴘᴏᴘᴋɪᴅ ᴋᴇɴʏᴀ* 🇰🇪`;
 
-        // --- SEND WITH IMAGE OR FALLBACK TO TEXT ---
+        // --- SEND WITH IMAGE ---
         try {
             await conn.sendMessage(m.chat, {
-                image: menuBuffer || { url: imageUrl },
+                image: menuBuffer ? menuBuffer : { url: imageUrl },
                 caption: menuText,
                 mimetype: 'image/jpeg'
-            }, { quoted: m.data || m });
+            }, { quoted: m });
         } catch (e) {
             console.error("Menu Send Error:", e);
-            await m.reply(menuText);
+            // Absolute fallback to text if image sending fails entirely
+            await conn.sendMessage(m.chat, { text: menuText }, { quoted: m });
         }
     }
 };
