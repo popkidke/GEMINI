@@ -1,4 +1,5 @@
 const config = require("../config");
+const os = require('os');
 const axios = require('axios');
 const { formatUptime, getNairobiTime } = require("../lib/utils");
 
@@ -9,13 +10,12 @@ module.exports = {
     cmd: "menu",
     alias: ["help", "list"],
     desc: "Ultra-Fast Vertical Menu",
-    category: "MAIN",
     async execute(conn, m, { pushName }) {
         const uptime = formatUptime(process.uptime());
-
+        
         // --- CLEAN DATE & TIME SPLIT ---
-        const fullTime = getNairobiTime();
-        const date = fullTime.split(' at ')[0].replace('Tuesday, ', '');
+        const fullTime = getNairobiTime(); 
+        const date = fullTime.split(' at ')[0].replace('Tuesday, ', ''); 
         const time = fullTime.split(' at ')[1];
 
         const totalPlugins = global.plugins.size;
@@ -23,7 +23,6 @@ module.exports = {
 
         // --- PRE-LOAD IMAGE INTO RAM ---
         const imageUrl = "https://raw.githubusercontent.com/popkidke/GEMINI/main/popkid.jpg";
-        
         if (!menuBuffer) {
             try {
                 const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
@@ -33,10 +32,7 @@ module.exports = {
             }
         }
 
-        const catEmojis = {
-            MAIN: "🏠", ADMIN: "🛡️", DOWNLOAD: "📥", TOOLS: "🛠️",
-            OWNER: "👑", GROUP: "👥", SEARCH: "🔍", MISC: "🌀", AI: "🤖"
-        };
+        const catEmojis = { ADMIN: "🛡️", DOWNLOAD: "📥", TOOLS: "🛠️", OWNER: "👑", GROUP: "👥", SEARCH: "🔍", MISC: "🌀", AI: "🤖" };
 
         // ─── PREMIUM BOX HEADER ───
         let menuText = `╭══════════════════⊷\n` +
@@ -59,6 +55,7 @@ module.exports = {
                 categories[cat].push(p.cmd);
             });
 
+            // Building Category Boxes (Downward list)
             Object.keys(categories).sort().forEach(category => {
                 const emoji = catEmojis[category] || "💠";
                 menuText += `╔══════════════════⊷\n`;
@@ -73,17 +70,11 @@ module.exports = {
 
         menuText += `\n*© 𝟤𝟢𝟤𝟨 ᴘᴏᴘᴋɪᴅ ᴋᴇɴʏᴀ* 🇰🇪`;
 
-        // --- SEND WITH IMAGE ---
-        try {
-            await conn.sendMessage(m.chat, {
-                image: menuBuffer ? menuBuffer : { url: imageUrl },
-                caption: menuText,
-                mimetype: 'image/jpeg'
-            }, { quoted: m });
-        } catch (e) {
-            console.error("Menu Send Error:", e);
-            // Absolute fallback to text if image sending fails entirely
-            await conn.sendMessage(m.chat, { text: menuText }, { quoted: m });
-        }
+        // 🚀 INSTANT SEND: Uses Cached Buffer from RAM
+        // Newsletter removed as it is added automatically by your engine
+        return await conn.sendMessage(m.from, { 
+            image: menuBuffer || { url: imageUrl }, 
+            caption: menuText 
+        }, { quoted: m });
     }
 };
