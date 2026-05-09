@@ -22,7 +22,7 @@ module.exports = {
         const ram = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1);
 
         // --- PRE-LOAD IMAGE INTO RAM ---
-        const imageUrl = "https://i.ibb.co/mCZGBpnf/file-00000000e62871fd8b3a4f4ea8696136.png";
+        const imageUrl = "https://raw.githubusercontent.com/popkidke/GEMINI/main/popkid.jpg";
         if (!menuBuffer) {
             try {
                 const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
@@ -78,7 +78,7 @@ module.exports = {
             await conn.sendMessage(m.chat, {
                 image: menuBuffer || { url: imageUrl },
                 caption: menuText,
-                mimetype: 'image/png'
+                mimetype: 'image/jpeg'
             }, { quoted: m.data || m });
         } catch (e) {
             console.error("Menu Send Error:", e);
